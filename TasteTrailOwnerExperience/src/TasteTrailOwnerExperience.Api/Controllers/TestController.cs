@@ -8,6 +8,7 @@ public class TestController : ControllerBase
 {
     [HttpGet]
     public IActionResult GetNumber() {
-        return Ok(2);
+        var postgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
+        return Ok(postgresConnectionString);
     }
 }

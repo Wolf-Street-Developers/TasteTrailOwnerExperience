@@ -20,7 +20,7 @@ services:
     image: owner_api
     build:
       context: .
-      dockerfile: api.Dockerfile
+      dockerfile: Dockerfile
     container_name: api
     environment:
       ASPNETCORE_URLS: http://+:80
