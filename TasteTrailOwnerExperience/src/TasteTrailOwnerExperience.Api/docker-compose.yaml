@@ -33,9 +33,9 @@ services:
       - owner
     restart: always
 
+volumes:
+  ownerdb_data:
+
 networks:
   owner:
     driver: bridge
-
-volumes:
-  ownerdb_data:
