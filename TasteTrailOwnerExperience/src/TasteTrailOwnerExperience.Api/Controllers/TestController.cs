@@ -8,6 +8,6 @@ public class TestController : ControllerBase
 {
     [HttpGet]
     public IActionResult GetNumber() {
-        return Ok(1);
+        return Ok(2);
     }
 }
