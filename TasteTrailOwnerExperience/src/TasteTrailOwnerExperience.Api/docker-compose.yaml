@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: ownerdb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    expose:
+      - ${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - owner
+    volumes:
+      - ownerdb_data:/var/lib/postgresql/data
+    restart: always
+
+  webapi:
+    image: owner_api
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    container_name: api
+    environment:
+      ASPNETCORE_URLS: http://+:80
+      POSTGRES_CONNECTION_STRING: "Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};Pooling=true;"
+    depends_on:
+      - postgres
+    ports:
+      - "5000:80"
+    networks:
+      - owner
+    restart: always
+
+networks:
+  owner:
+    driver: bridge
+
+volumes:
+  ownerdb_data:
