@@ -25,6 +25,14 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:80
       POSTGRES_CONNECTION_STRING: "Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};Pooling=true;"
+
+      BLOB_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=${AZURE_BLOB_DEFAULT_PROTOCOL};AccountName=${AZURE_BLOB_ACCOUNT_NAME};AccountKey=${AZURE_BLOB_ACCOUNT_KEY};EndpointSuffix=${AZURE_BLOB_ENDPOINT_SUFFIX}"
+
+      JWT_KEY: "${JWT_KEY}"
+      JWT_LIFE_TIME_IN_MINUTES: "${JWT_LIFE_TIME_IN_MINUTES}"
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+
     depends_on:
       - postgres
     ports:
@@ -32,6 +40,7 @@ services:
     networks:
       - owner
     restart: always
+
 
 volumes:
   ownerdb_data:

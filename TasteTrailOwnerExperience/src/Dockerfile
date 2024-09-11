@@ -10,7 +10,9 @@ COPY . .
 
 RUN dotnet publish TasteTrailOwnerExperience.Api/*.csproj -c Release -o /app/publish
 
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT [ "dotnet", "TasteTrailOwnerExperience.Api.dll" ]
+
+ENTRYPOINT ["dotnet", "TasteTrailOwnerExperience.Api.dll"]

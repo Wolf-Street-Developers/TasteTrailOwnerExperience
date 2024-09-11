@@ -12,6 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+
+  <ItemGroup>
     <ProjectReference Include="..\TasteTrailOwnerExperience.Infrastructure\TasteTrailOwnerExperience.Infrastructure.csproj" />
   </ItemGroup>
 

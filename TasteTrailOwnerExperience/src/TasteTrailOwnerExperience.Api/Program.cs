@@ -1,29 +1,50 @@
+using System.Reflection;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using TasteTrailData.Api.Common.Assembly;
+using TasteTrailData.Api.Common.Extensions.ServiceCollection;
+using TasteTrailOwnerExperience.Api.Common.Extensions.ServiceCollection;
 using TasteTrailOwnerExperience.Infrastructure.Common.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var postgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING");
+builder.Services.InitDbContext(builder.Configuration);
+builder.Services.InitAuth(builder.Configuration);
+builder.Services.InitSwagger();
+builder.Services.InitCors();
 
-if (!string.IsNullOrEmpty(postgresConnectionString)) {
-    System.Console.WriteLine(postgresConnectionString);
-    builder.Configuration["ConnectionStrings:DefaultConnection"] = postgresConnectionString;
-}
+builder.Services.RegisterBlobStorage(builder.Configuration);
+builder.Services.RegisterDependencyInjection();
 
-
-// Настраиваем DbContext с использованием строки подключения из конфигурации
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<OwnerExperienceDbContext>(options =>
-    options.UseNpgsql(connectionString));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+var assembly = Assembly.GetAssembly(typeof(ApiAssemblyMarker)) ?? throw new InvalidOperationException("Unable to load the assembly containing ApiAssemblyMarker.");
+
+builder.Services.AddValidatorsFromAssembly(assembly);
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<OwnerExperienceDbContext>();
+
+    dbContext.Database.Migrate();
+}
+
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseCors("AllowAllOrigins");
+
 app.MapControllers();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
