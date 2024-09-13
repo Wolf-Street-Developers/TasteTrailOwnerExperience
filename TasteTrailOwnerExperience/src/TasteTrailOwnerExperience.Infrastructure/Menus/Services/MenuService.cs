@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using TasteTrailData.Core.Roles.Enums;
 using TasteTrailOwnerExperience.Core.Common.Exceptions;
+using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.MenuItems.Services;
 using TasteTrailOwnerExperience.Core.Menus.Dtos;
 using TasteTrailOwnerExperience.Core.Menus.Models;
@@ -8,6 +9,7 @@ using TasteTrailOwnerExperience.Core.Menus.Repositories;
 using TasteTrailOwnerExperience.Core.Menus.Services;
 using TasteTrailOwnerExperience.Core.Users.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Repositories;
+using TasteTrailOwnerExperience.Infrastructure.Common.RabbitMq.Dtos;
 
 namespace TasteTrailOwnerExperience.Infrastructure.Menus.Services;
 
@@ -21,12 +23,15 @@ public class MenuService : IMenuService
 
     private readonly MenuImageManager _menuImageManager;
 
-    public MenuService(IMenuRepository menuRepository, IVenueRepository venueRepository, MenuImageManager menuImageManager, IMenuItemService menuItemService)
+    private readonly IMessageBrokerService _messageBroker;
+
+    public MenuService(IMenuRepository menuRepository, IVenueRepository venueRepository, MenuImageManager menuImageManager, IMenuItemService menuItemService, IMessageBrokerService messageBroker)
     {
         _menuRepository = menuRepository;
         _venueRepository = venueRepository;
         _menuImageManager = menuImageManager;
         _menuItemService = menuItemService;
+        _messageBroker = messageBroker;
     }
 
     public async Task<Menu?> GetMenuByIdAsync(int id)
@@ -56,6 +61,11 @@ public class MenuService : IMenuService
 
         var menuId = await _menuRepository.CreateAsync(newMenu);
 
+        // Setting default image
+        var imageUrl = await _menuImageManager.SetImageAsync(menuId, null);
+
+        await _messageBroker.PushAsync("menu_create", newMenu);
+
         return menuId;
     }
 
@@ -76,6 +86,8 @@ public class MenuService : IMenuService
 
         await _menuItemService.DeleteMenuItemImagesByMenuIdAsync(menu.Id, userInfo);
         var menuId = await _menuRepository.DeleteByIdAsync(id);
+
+        await _messageBroker.PushAsync("menu_delete", menuId);
 
         return menuId;
     }
@@ -99,6 +111,7 @@ public class MenuService : IMenuService
         };
 
         var menuId = await _menuRepository.PutAsync(updatedMenu);
+        await _messageBroker.PushAsync("menu_update", updatedMenu);
 
         return menuId;
     }
@@ -114,6 +127,7 @@ public class MenuService : IMenuService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuImageManager.SetImageAsync(menu.Id, image);
+        await _messageBroker.PushAsync("menu_set_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = menuId});
 
         return imageUrl;
     }
@@ -129,6 +143,7 @@ public class MenuService : IMenuService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuImageManager.DeleteImageAsync(menu.Id);
+        await _messageBroker.PushAsync("menu_delete_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = menuId});
 
         return imageUrl;
     }

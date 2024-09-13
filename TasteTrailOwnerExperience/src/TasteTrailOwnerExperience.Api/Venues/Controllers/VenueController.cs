@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TasteTrailData.Api.Common.Extensions.Controllers;
 using TasteTrailData.Core.Roles.Enums;
 using TasteTrailOwnerExperience.Core.Common.Exceptions;
+using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.Users.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Services;
@@ -33,9 +34,6 @@ public class VenueController : Controller
             };
             
             var venueId = await _venueService.CreateVenueAsync(venue, userInfo);
-
-            // Setting default image
-            await _venueService.SetVenueImageAsync(venueId, userInfo, null);
 
             return Ok(venueId);
         }

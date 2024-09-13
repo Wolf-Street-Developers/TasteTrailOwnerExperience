@@ -27,7 +27,6 @@ public class VenueEfCoreRepository : IVenueRepository
         return await _dbContext.Venues
             .FirstOrDefaultAsync(v => v.Id == id);
     }
-
     
     public async Task<int> CreateAsync(Venue venue)
     {
@@ -65,6 +64,7 @@ public class VenueEfCoreRepository : IVenueRepository
         venueToUpdate.Name = venue.Name;
         venueToUpdate.Latitude = venue.Latitude;
         venueToUpdate.Longtitude = venue.Longtitude;
+        venueToUpdate.LogoUrlPath = venue.LogoUrlPath;
         venueToUpdate.Address = venue.Address;
         venueToUpdate.ContactNumber = venue.ContactNumber;
         venueToUpdate.Email = venue.Email;

@@ -2,7 +2,7 @@
 
 using System.Text;
 
-namespace TasteTrailExperience.Infrastructure.Common.Options;
+namespace TasteTrailExperience.Core.Common.Options;
 
 public class JwtOptions
 {

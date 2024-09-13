@@ -1,9 +1,11 @@
+using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.MenuItems.Repositories;
 using TasteTrailOwnerExperience.Core.MenuItems.Services;
 using TasteTrailOwnerExperience.Core.Menus.Repositories;
 using TasteTrailOwnerExperience.Core.Menus.Services;
 using TasteTrailOwnerExperience.Core.Venues.Repositories;
 using TasteTrailOwnerExperience.Core.Venues.Services;
+using TasteTrailOwnerExperience.Infrastructure.Common.RabbitMq;
 using TasteTrailOwnerExperience.Infrastructure.MenuItems.Managers;
 using TasteTrailOwnerExperience.Infrastructure.MenuItems.Repositories;
 using TasteTrailOwnerExperience.Infrastructure.MenuItems.Services;
@@ -26,6 +28,7 @@ public static class RegisterDependencyInjectionMethod
         serviceCollection.AddTransient<IVenueService, VenueService>();
         serviceCollection.AddTransient<IMenuService, MenuService>();
         serviceCollection.AddTransient<IMenuItemService, MenuItemService>();
+        serviceCollection.AddTransient<IMessageBrokerService, RabbitMqService>();
 
         serviceCollection.AddTransient<VenueImageManager>();
         serviceCollection.AddTransient<MenuItemImageManager>();

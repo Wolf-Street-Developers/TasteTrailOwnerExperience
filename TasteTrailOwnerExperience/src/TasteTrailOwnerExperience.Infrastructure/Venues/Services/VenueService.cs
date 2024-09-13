@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using TasteTrailData.Core.Roles.Enums;
 using TasteTrailOwnerExperience.Core.Common.Exceptions;
+using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.Menus.Services;
 using TasteTrailOwnerExperience.Core.Users.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Models;
 using TasteTrailOwnerExperience.Core.Venues.Repositories;
 using TasteTrailOwnerExperience.Core.Venues.Services;
+using TasteTrailOwnerExperience.Infrastructure.Common.RabbitMq.Dtos;
 using TasteTrailOwnerExperience.Infrastructure.Venues.Managers;
 
 namespace TasteTrailOwnerExperience.Infrastructure.Venues.Services;
@@ -19,12 +21,17 @@ public class VenueService : IVenueService
 
     private readonly VenueImageManager _venueImageManager;
 
-    public VenueService(IVenueRepository venueRepository,  VenueImageManager venueImageManager, IMenuService menuService)
+    private readonly IMessageBrokerService _messageBroker;
+    
+
+    public VenueService(IVenueRepository venueRepository,  VenueImageManager venueImageManager, IMenuService menuService,IMessageBrokerService messageBroker)
     {
         _venueRepository = venueRepository;
         _venueImageManager = venueImageManager;
         _menuService = menuService;
+        _messageBroker = messageBroker;
     }
+    
 
     public async Task<Venue?> GetVenueByIdAsync(int id)
     {
@@ -53,6 +60,11 @@ public class VenueService : IVenueService
 
         var venueId = await _venueRepository.CreateAsync(newVenue);
 
+        // Setting default image
+        await _venueImageManager.SetImageAsync(venueId, null); 
+
+        await _messageBroker.PushAsync("venue_create", newVenue); 
+
         return venueId;
     }
 
@@ -74,6 +86,8 @@ public class VenueService : IVenueService
         // Deleting all nested
         await _menuService.DeleteMenuImagesByVenueIdAsync(venue.Id, userInfo);
         var venueId = await _venueRepository.DeleteByIdAsync(id);
+
+        await _messageBroker.PushAsync("venue_delete", venueId);
 
         return venueId;
     }
@@ -105,6 +119,7 @@ public class VenueService : IVenueService
         };
 
         var venueId = await _venueRepository.PutAsync(updatedVenue);
+        await _messageBroker.PushAsync("venue_put", updatedVenue);
 
         return venueId;
     }
@@ -120,6 +135,7 @@ public class VenueService : IVenueService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _venueImageManager.SetImageAsync(venue.Id, image);
+        await _messageBroker.PushAsync("venue_set_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = venueId });
 
         return imageUrl;
     }
@@ -135,6 +151,8 @@ public class VenueService : IVenueService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _venueImageManager.DeleteImageAsync(venue.Id);
+
+        await _messageBroker.PushAsync("venue_delete_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = venueId });
 
         return imageUrl;
     }

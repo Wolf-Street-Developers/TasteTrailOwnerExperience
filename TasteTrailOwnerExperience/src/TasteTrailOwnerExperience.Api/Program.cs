@@ -5,9 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using TasteTrailData.Api.Common.Assembly;
 using TasteTrailData.Api.Common.Extensions.ServiceCollection;
 using TasteTrailOwnerExperience.Api.Common.Extensions.ServiceCollection;
+using TasteTrailOwnerExperience.Api.Common.Utilities;
+using TasteTrailOwnerExperience.Core.Common.Options;
 using TasteTrailOwnerExperience.Infrastructure.Common.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+SetupEnvironmentVariables.SetupEnvironmentVariablesMethod(builder.Configuration, builder.Environment.IsDevelopment());
 
 builder.Services.InitDbContext(builder.Configuration);
 builder.Services.InitAuth(builder.Configuration);
@@ -16,6 +20,9 @@ builder.Services.InitCors();
 
 builder.Services.RegisterBlobStorage(builder.Configuration);
 builder.Services.RegisterDependencyInjection();
+
+var rabbitMqSection = builder.Configuration.GetSection("RabbitMq");
+builder.Services.Configure<RabbitMqOptions>(rabbitMqSection);
 
 
 builder.Services.AddEndpointsApiExplorer();
