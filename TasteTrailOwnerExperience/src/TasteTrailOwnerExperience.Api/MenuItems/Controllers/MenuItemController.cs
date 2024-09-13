@@ -34,9 +34,6 @@ public class MenuItemController : ControllerBase
 
             var menuItemId = await _menuItemService.CreateMenuItemAsync(menuItem, userInfo);
 
-            // Setting default image
-            await _menuItemService.SetMenuItemImageAsync(menuItemId, userInfo, null);
-
             return Ok(menuItemId);
         }
         catch (ArgumentException ex)

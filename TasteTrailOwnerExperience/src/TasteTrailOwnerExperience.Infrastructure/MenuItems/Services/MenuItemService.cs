@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using TasteTrailData.Core.Roles.Enums;
 using TasteTrailOwnerExperience.Core.Common.Exceptions;
+using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.MenuItems.Dtos;
 using TasteTrailOwnerExperience.Core.MenuItems.Models;
 using TasteTrailOwnerExperience.Core.MenuItems.Repositories;
@@ -19,11 +20,14 @@ public class MenuItemService : IMenuItemService
 
     private readonly MenuItemImageManager _menuItemImageManager;
 
-    public MenuItemService(IMenuItemRepository menuItemRepository, IMenuRepository menuRepository, MenuItemImageManager  menuItemImageManager)
+    private readonly IMessageBrokerService _messageBroker;
+
+    public MenuItemService(IMenuItemRepository menuItemRepository, IMenuRepository menuRepository, MenuItemImageManager  menuItemImageManager, IMessageBrokerService messageBroker)
     {
         _menuItemRepository = menuItemRepository;
         _menuRepository = menuRepository;
         _menuItemImageManager = menuItemImageManager;
+        _messageBroker = messageBroker;
     }
 
     public async Task<MenuItem?> GetMenuItemByIdAsync(int id)
@@ -54,6 +58,11 @@ public class MenuItemService : IMenuItemService
 
         var menuItemId = await _menuItemRepository.CreateAsync(newMenuItem);
 
+        // Setting default image
+        await _menuItemImageManager.SetImageAsync(menuItemId, null);
+
+        await _messageBroker.PushAsync("menuitem_create", newMenuItem);
+
         return menuItemId;
     }
 
@@ -74,6 +83,8 @@ public class MenuItemService : IMenuItemService
 
 
         var menuItemId = await _menuItemRepository.DeleteByIdAsync(id);
+
+        await _messageBroker.PushAsync("menuitem_delete", menuItemId);
 
         return menuItemId;
     }
@@ -99,7 +110,7 @@ public class MenuItemService : IMenuItemService
 
         var menuItemId = await _menuItemRepository.PutAsync(updatedMenuItem);
 
-        
+        await _messageBroker.PushAsync("menuitem_put", menuItemId);
 
         return menuItemId;
     }
@@ -115,6 +126,7 @@ public class MenuItemService : IMenuItemService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuItemImageManager.SetImageAsync(menuItem.Id, image);
+        await _messageBroker.PushAsync("menuitem_set_image", menuItemId);
 
         return imageUrl;
     }
@@ -130,6 +142,7 @@ public class MenuItemService : IMenuItemService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuItemImageManager.DeleteImageAsync(menuItem.Id);
+        await _messageBroker.PushAsync("menuitem_delete_image", menuItemId);
 
         return imageUrl;
     }
