@@ -18,13 +18,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore TasteTrailOwnerExperience/src/TasteTrailOwnerExperience.Api/TasteTrailOwnerExperience.Api.csproj
 
       - name: Build Project
-        run: dotnet build
+        run: dotnet build TasteTrailOwnerExperience/src/TasteTrailOwnerExperience.Api/TasteTrailOwnerExperience.Api.csproj
 
       - name: Run Unit Tests
-        run: dotnet test
+        run: dotnet test TasteTrailOwnerExperience/test/UnitTests/UnitTests.csproj
 
   deploy:
     name: Build and Push Docker image
@@ -42,7 +42,7 @@ jobs:
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
       - name: Build Image
-        run: docker build -f TasteTrailOwnerExperience/src/Dockerfile -t ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.IMAGE_NAME}}:latest TasteTrailOwnerExperience/src
+        run: docker build -f . -t ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.IMAGE_NAME}}:latest TasteTrailOwnerExperience/src
 
       - name: Push Image
         run: docker push ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.IMAGE_NAME}}:latest

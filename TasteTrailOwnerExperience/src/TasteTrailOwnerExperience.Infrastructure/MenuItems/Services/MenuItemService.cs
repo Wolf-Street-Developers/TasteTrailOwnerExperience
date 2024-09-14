@@ -8,6 +8,7 @@ using TasteTrailOwnerExperience.Core.MenuItems.Repositories;
 using TasteTrailOwnerExperience.Core.MenuItems.Services;
 using TasteTrailOwnerExperience.Core.Menus.Repositories;
 using TasteTrailOwnerExperience.Core.Users.Dtos;
+using TasteTrailOwnerExperience.Infrastructure.Common.RabbitMq.Dtos;
 using TasteTrailOwnerExperience.Infrastructure.MenuItems.Managers;
 
 namespace TasteTrailOwnerExperience.Infrastructure.MenuItems.Services;
@@ -110,7 +111,7 @@ public class MenuItemService : IMenuItemService
 
         var menuItemId = await _menuItemRepository.PutAsync(updatedMenuItem);
 
-        await _messageBroker.PushAsync("menuitem_put", menuItemId);
+        await _messageBroker.PushAsync("menuitem_put", updatedMenuItem);
 
         return menuItemId;
     }
@@ -126,7 +127,7 @@ public class MenuItemService : IMenuItemService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuItemImageManager.SetImageAsync(menuItem.Id, image);
-        await _messageBroker.PushAsync("menuitem_set_image", menuItemId);
+        await _messageBroker.PushAsync("menuitem_set_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = menuItemId});
 
         return imageUrl;
     }
@@ -142,7 +143,7 @@ public class MenuItemService : IMenuItemService
             throw new ForbiddenAccessException();
         
         var imageUrl = await _menuItemImageManager.DeleteImageAsync(menuItem.Id);
-        await _messageBroker.PushAsync("menuitem_delete_image", menuItemId);
+        await _messageBroker.PushAsync("menuitem_delete_image", new ImageMessageDto() { ImageUrl = imageUrl, EntityId = menuItemId});
 
         return imageUrl;
     }

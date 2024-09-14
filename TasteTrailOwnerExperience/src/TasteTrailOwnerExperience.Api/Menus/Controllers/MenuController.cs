@@ -66,6 +66,9 @@ public class MenuController : ControllerBase
 
             var imageUrl = await _menuService.SetMenuImageAsync(menuId, userInfo, image);
 
+            if (imageUrl is null)
+                return NotFound(menuId);
+
             return Ok(imageUrl);
         }
         catch (ArgumentException ex)
@@ -126,6 +129,9 @@ public class MenuController : ControllerBase
             };
 
             var imageUrl = await _menuService.DeleteMenuImageAsync(menuId, userInfo);
+
+            if (imageUrl is null)
+                return NotFound(menuId);
 
             return Ok(imageUrl);
         }

@@ -66,6 +66,9 @@ public class VenueController : Controller
 
             var imageUrl = await _venueService.SetVenueImageAsync(venueId, userInfo, image);
 
+            if (imageUrl is null)
+                return NotFound(venueId);
+
             return Ok(imageUrl);
         }
         catch (ArgumentException ex)
@@ -125,6 +128,9 @@ public class VenueController : Controller
             };
 
             var imageUrl = await _venueService.DeleteVenueImageAsync(venueId, userInfo);
+
+            if (imageUrl is null)
+                return NotFound(venueId);
 
             return Ok(imageUrl);
         }
