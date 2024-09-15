@@ -87,7 +87,7 @@ public class VenueController : Controller
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteByIdAsync(int venueId)
+    public async Task<IActionResult> DeleteByIdAsync(int id)
     {
         try
         {
@@ -96,10 +96,10 @@ public class VenueController : Controller
                 Role = User.FindFirst(ClaimTypes.Role)!.Value,
             };
 
-            var venue = await _venueService.GetVenueByIdAsync(venueId);
+            var venue = await _venueService.GetVenueByIdAsync(id);
 
             if (venue is null)
-                return NotFound(venueId);
+                return NotFound(id);
 
             await _venueService.DeleteVenueImageAsync(venue.Id, userInfo);
             var deletedId = await _venueService.DeleteVenueByIdAsync(venue.Id, userInfo);
