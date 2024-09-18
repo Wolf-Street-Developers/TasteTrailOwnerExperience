@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using TasteTrailData.Api.Common.Extensions.Controllers;
 using TasteTrailData.Core.Roles.Enums;
 using TasteTrailOwnerExperience.Core.Common.Exceptions;
-using TasteTrailOwnerExperience.Core.Common.MessageBroker;
 using TasteTrailOwnerExperience.Core.Users.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Dtos;
 using TasteTrailOwnerExperience.Core.Venues.Services;
@@ -24,7 +23,7 @@ public class VenueController : Controller
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> CreateAsync([FromForm] VenueCreateDto venue)
+    public async Task<IActionResult> CreateAsync([FromBody] VenueCreateDto venue)
     {
         try
         {
@@ -53,7 +52,7 @@ public class VenueController : Controller
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> SetImageAsync(int venueId, IFormFile image)
+    public async Task<IActionResult> SetImageAsync([FromQuery] int venueId, IFormFile image)
     {
         try
         {
@@ -87,7 +86,7 @@ public class VenueController : Controller
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteByIdAsync(int id)
+    public async Task<IActionResult> DeleteByIdAsync([FromQuery] int venueId)
     {
         try
         {
@@ -96,10 +95,10 @@ public class VenueController : Controller
                 Role = User.FindFirst(ClaimTypes.Role)!.Value,
             };
 
-            var venue = await _venueService.GetVenueByIdAsync(id);
+            var venue = await _venueService.GetVenueByIdAsync(venueId);
 
             if (venue is null)
-                return NotFound(id);
+                return NotFound(venueId);
 
             await _venueService.DeleteVenueImageAsync(venue.Id, userInfo);
             var deletedId = await _venueService.DeleteVenueByIdAsync(venue.Id, userInfo);
@@ -118,7 +117,7 @@ public class VenueController : Controller
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteImageAsync(int venueId)
+    public async Task<IActionResult> DeleteImageAsync([FromQuery] int venueId)
     {
         try
         {
@@ -150,7 +149,7 @@ public class VenueController : Controller
 
     [HttpPut]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> UpdateAsync([FromForm] VenueUpdateDto venue)
+    public async Task<IActionResult> UpdateAsync([FromBody] VenueUpdateDto venue)
     {
         try
         {

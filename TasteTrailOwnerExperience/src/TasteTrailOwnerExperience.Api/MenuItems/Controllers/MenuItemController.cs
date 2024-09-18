@@ -23,7 +23,7 @@ public class MenuItemController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> CreateAsync([FromForm] MenuItemCreateDto menuItem)
+    public async Task<IActionResult> CreateAsync([FromBody] MenuItemCreateDto menuItem)
     {
         try
         {
@@ -52,7 +52,7 @@ public class MenuItemController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> SetImageAsync(int menuItemId, IFormFile image)
+    public async Task<IActionResult> SetImageAsync([FromQuery] int menuItemId, IFormFile image)
     {
         try
         {
@@ -86,7 +86,7 @@ public class MenuItemController : ControllerBase
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteByIdAsync(int menuItemId)
+    public async Task<IActionResult> DeleteByIdAsync([FromQuery] int menuItemId)
     {
         try
         {
@@ -117,7 +117,7 @@ public class MenuItemController : ControllerBase
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteImageAsync(int menuItemId)
+    public async Task<IActionResult> DeleteImageAsync([FromQuery] int menuItemId)
     {
         try
         {
@@ -149,7 +149,7 @@ public class MenuItemController : ControllerBase
 
     [HttpPut]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> UpdateAsync([FromForm] MenuItemUpdateDto menuItem)
+    public async Task<IActionResult> UpdateAsync([FromBody] MenuItemUpdateDto menuItem)
     {
         try
         {

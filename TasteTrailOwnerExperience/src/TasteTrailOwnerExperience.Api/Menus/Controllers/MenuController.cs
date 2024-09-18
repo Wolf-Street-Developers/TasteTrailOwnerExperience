@@ -24,7 +24,7 @@ public class MenuController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> CreateAsync([FromForm] MenuCreateDto menu)
+    public async Task<IActionResult> CreateAsync([FromBody] MenuCreateDto menu)
     {
         try
         {
@@ -53,7 +53,7 @@ public class MenuController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> SetImageAsync(int menuId, IFormFile image)
+    public async Task<IActionResult> SetImageAsync([FromQuery] int menuId, IFormFile image)
     {
         try
         {
@@ -87,7 +87,7 @@ public class MenuController : ControllerBase
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteByIdAsync(int id)
+    public async Task<IActionResult> DeleteByIdAsync([FromQuery] int menuId)
     {
         try
         {
@@ -96,14 +96,14 @@ public class MenuController : ControllerBase
                 Role = User.FindFirst(ClaimTypes.Role)!.Value,
             };
 
-            var menu = await _menuService.GetMenuByIdAsync(id);
+            var menu = await _menuService.GetMenuByIdAsync(menuId);
 
             if (menu is null)
-                return NotFound(id);
+                return NotFound(menuId);
 
             
             await _menuService.DeleteMenuImageAsync(menu.Id, userInfo);
-            var deletedId = await _menuService.DeleteMenuByIdAsync(id, userInfo);
+            var deletedId = await _menuService.DeleteMenuByIdAsync(menuId, userInfo);
 
             return Ok(deletedId);
         }
@@ -119,7 +119,7 @@ public class MenuController : ControllerBase
 
     [HttpDelete]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> DeleteImageAsync(int id)
+    public async Task<IActionResult> DeleteImageAsync([FromQuery] int menuId)
     {
         try
         {
@@ -128,10 +128,10 @@ public class MenuController : ControllerBase
                 Role = User.FindFirst(ClaimTypes.Role)!.Value,
             };
 
-            var imageUrl = await _menuService.DeleteMenuImageAsync(id, userInfo);
+            var imageUrl = await _menuService.DeleteMenuImageAsync(menuId, userInfo);
 
             if (imageUrl is null)
-                return NotFound(id);
+                return NotFound(menuId);
 
             return Ok(imageUrl);
         }
@@ -151,7 +151,7 @@ public class MenuController : ControllerBase
 
     [HttpPut]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
-    public async Task<IActionResult> UpdateAsync([FromForm] MenuUpdateDto menu)
+    public async Task<IActionResult> UpdateAsync([FromBody] MenuUpdateDto menu)
     {
         try
         {
