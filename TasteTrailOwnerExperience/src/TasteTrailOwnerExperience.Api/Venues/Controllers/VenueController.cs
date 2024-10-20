@@ -21,6 +21,26 @@ public class VenueController : Controller
         _venueService = venueService;
     }
 
+    [HttpGet]
+    [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
+    public async Task<IActionResult> GetByUserIdAsync()
+    {
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var venue = await _venueService.GetVenueByUserIdAsync(userId);
+
+            if (venue is null)
+                return NotFound(userId);
+
+            return Ok(venue);
+        }
+        catch (Exception ex)
+        {
+            return this.InternalServerError(ex.Message);
+        }
+    }
+
     [HttpPost]
     [Authorize(Roles = $"{nameof(UserRoles.Admin)},{nameof(UserRoles.Owner)}")]
     public async Task<IActionResult> CreateAsync([FromBody] VenueCreateDto venue)

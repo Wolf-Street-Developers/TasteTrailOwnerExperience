@@ -21,6 +21,11 @@ public class VenueEfCoreRepository : IVenueRepository
             .FirstOrDefaultAsync(v => v.Id == id);
     }
 
+    public async Task<Venue?> GetByUserIdAsync(string userId)
+    {
+        return await _dbContext.Venues
+            .FirstOrDefaultAsync(v => v.UserId == userId);
+    }
     
     public async Task<Venue?> GetByIdAsync(int id)
     {

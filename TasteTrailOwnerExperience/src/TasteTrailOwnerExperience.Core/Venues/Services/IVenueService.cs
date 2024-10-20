@@ -7,6 +7,8 @@ namespace TasteTrailOwnerExperience.Core.Venues.Services;
 
 public interface IVenueService
 {
+    Task<Venue?> GetVenueByUserIdAsync(string userId);
+
     Task<Venue?> GetVenueByIdAsync(int id);
 
     Task<int> CreateVenueAsync(VenueCreateDto venue, UserInfoDto userInfo);

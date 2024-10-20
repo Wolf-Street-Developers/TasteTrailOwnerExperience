@@ -32,6 +32,18 @@ public class VenueService : IVenueService
         _messageBroker = messageBroker;
     }
     
+    public async Task<Venue?> GetVenueByUserIdAsync(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+            throw new ArgumentNullException(nameof(userId));
+
+        var venue = await _venueRepository.GetByUserIdAsync(userId);
+
+        if (venue is null)
+            return null;
+
+        return venue;
+    }
 
     public async Task<Venue?> GetVenueByIdAsync(int id)
     {

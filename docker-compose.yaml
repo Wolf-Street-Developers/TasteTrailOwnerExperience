@@ -1,6 +1,6 @@
 services:
   owner-postgres:
-    image: postgres:latest
+    image: postgres:16
     container_name: owner-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
