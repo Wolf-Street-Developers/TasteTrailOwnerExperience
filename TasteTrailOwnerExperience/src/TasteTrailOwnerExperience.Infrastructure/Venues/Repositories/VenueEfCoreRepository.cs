@@ -21,10 +21,10 @@ public class VenueEfCoreRepository : IVenueRepository
             .FirstOrDefaultAsync(v => v.Id == id);
     }
 
-    public async Task<Venue?> GetByUserIdAsync(string userId)
+    public async Task<List<Venue>> GetByUserIdAsync(string userId)
     {
         return await _dbContext.Venues
-            .FirstOrDefaultAsync(v => v.UserId == userId);
+            .Where(v => v.UserId == userId).ToListAsync();
     }
     
     public async Task<Venue?> GetByIdAsync(int id)

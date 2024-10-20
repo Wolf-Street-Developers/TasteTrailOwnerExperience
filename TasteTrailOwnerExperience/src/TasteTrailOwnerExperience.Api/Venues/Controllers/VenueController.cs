@@ -28,12 +28,9 @@ public class VenueController : Controller
         try
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var venue = await _venueService.GetVenueByUserIdAsync(userId);
+            var venues = await _venueService.GetVenuesByUserIdAsync(userId);
 
-            if (venue is null)
-                return NotFound(userId);
-
-            return Ok(venue);
+            return Ok(venues);
         }
         catch (Exception ex)
         {
