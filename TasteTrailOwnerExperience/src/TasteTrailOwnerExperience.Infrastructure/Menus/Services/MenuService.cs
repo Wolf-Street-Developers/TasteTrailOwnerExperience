@@ -111,7 +111,7 @@ public class MenuService : IMenuService
         };
 
         var menuId = await _menuRepository.PutAsync(updatedMenu);
-        await _messageBroker.PushAsync("menu_update", updatedMenu);
+        await _messageBroker.PushAsync("menu_put", updatedMenu);
 
         return menuId;
     }
