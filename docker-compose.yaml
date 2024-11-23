@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "8000:${POSTGRES_PORT}"
+      - "8500:${POSTGRES_PORT}"
     networks:
       - owner
     volumes:
@@ -34,7 +34,7 @@ services:
     depends_on:
       - owner-postgres
     ports:
-      - "8500:80"
+      - "8000:80"
     networks:
       - owner
     restart: always
